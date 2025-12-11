@@ -1,4 +1,7 @@
-.idea/
+.idea/KM-Bank-App-API.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
