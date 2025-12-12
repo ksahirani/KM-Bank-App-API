@@ -282,5 +282,127 @@ public class DTOs {
         }
     }
 
+    // ======== ADMIN DTOs ===========
 
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AdminDashboardResponse {
+        private long totalUsers;
+        private long totalAccounts;
+        private long totalTransactions;
+        private BigDecimal totalDeposits;
+        private BigDecimal totalWithdrawals;
+        private BigDecimal totalTransfers;
+        private BigDecimal systemBalance;
+        private long newUsersToday;
+        private long transactionsToday;
+        private List<UserResponse> recentUsers;
+        private List<AdminTransactionResponse> recentTransactions;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserDetailResponse {
+        private UserResponse user;
+        private List<AccountResponse> accounts;
+        private BigDecimal totalBalance;
+        private long transactionCount;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AdminTransactionResponse {
+        private Long id;
+        private String referenceNumber;
+        private String transactionType;
+        private BigDecimal amount;
+        private String currency;
+        private String description;
+        private String status;
+        private String sourceAccountNumber;
+        private String sourceAccountOwner;
+        private String destinationAccountNumber;
+        private String destinationAccountOwner;
+        private String recipientName;
+        private String recipientBank;
+        private BigDecimal balanceAfter;
+        private LocalDateTime createdAt;
+
+        public static AdminTransactionResponse fromEntity(Transaction transaction) {
+            return AdminTransactionResponse.builder()
+                    .id(transaction.getId())
+                    .referenceNumber(transaction.getReferenceNumber())
+                    .transactionType(transaction.getTransactionType().name())
+                    .amount(transaction.getAmount())
+                    .currency(transaction.getCurrency())
+                    .description(transaction.getDescription())
+                    .status(transaction.getStatus().name())
+                    .sourceAccountNumber(transaction.getSourceAccount() != null ?
+                            transaction.getSourceAccount().getAccountNumber() : null)
+                    .sourceAccountOwner(transaction.getSourceAccount() != null ?
+                            transaction.getSourceAccount().getUser().getFullName() : null)
+                    .destinationAccountNumber(transaction.getDestinationAccount() != null ?
+                            transaction.getDestinationAccount().getAccountNumber() : transaction.getRecipientAccount())
+                    .destinationAccountOwner(transaction.getDestinationAccount() != null ?
+                            transaction.getDestinationAccount().getUser().getFullName() : transaction.getRecipientName())
+                    .recipientName(transaction.getRecipientName())
+                    .recipientBank(transaction.getRecipientBank())
+                    .balanceAfter(transaction.getBalanceAfter())
+                    .createdAt(transaction.getCreatedAt())
+                    .build();
+        }
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AdminAccountDetailResponse {
+        private AccountResponse account;
+        private String ownerName;
+        private String ownerEmail;
+        private Long ownerId;
+        private List<TransactionResponse> recentTransactions;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AnalyticsResponse {
+        private List<DailyStatResponse> dailyStats;
+        private List<AccountTypeStatResponse> accountTypeStats;
+        private BigDecimal totalDeposits;
+        private BigDecimal totalWithdrawals;
+        private long newUsers;
+        private long newAccounts;
+        private String period;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DailyStatResponse {
+        private String date;
+        private BigDecimal deposits;
+        private BigDecimal withdrawals;
+        private long transactionCount;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AccountTypeStatResponse {
+        private String accountType;
+        private long count;
+        private BigDecimal totalBalance;
+    }
 }
