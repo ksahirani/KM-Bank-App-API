@@ -1,6 +1,5 @@
 package com.kmbank.repository;
 
-import com.kmbank.dto.AccountTypeStatResponse;
 import com.kmbank.entity.Account;
 import com.kmbank.entity.User;
 import org.springframework.data.domain.Page;

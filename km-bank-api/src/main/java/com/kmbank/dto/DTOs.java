@@ -92,7 +92,6 @@ public class DTOs {
         }
     }
 
-
     @Data
     @Builder
     @NoArgsConstructor
@@ -103,5 +102,137 @@ public class DTOs {
         private String phoneNumber;
         private String profileImage;
     }
+
+    // ======= ACCOUNT DTOs ======
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CreateAccountRequest {
+        @NotBlank(message = "Account name is required")
+        private String accountName;
+
+        @NotNull(message = "Account type is required")
+        private Account.AccountType accountType;
+
+        private String currency;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AccountResponse {
+        private Long id;
+        private String accountNumber;
+        private String accountName;
+        private String accountType;
+        private BigDecimal balance;
+        private String currency;
+        private String status;
+        private LocalDateTime createdAt;
+
+        public static AccountResponse fromEntity(Account account) {
+            return AccountResponse.builder()
+                    .id(account.getId())
+                    .accountNumber(account.getAccountNumber())
+                    .accountName(account.getAccountName())
+                    .accountType(account.getAccountType().name())
+                    .balance(account.getBalance())
+                    .currency(account.getCurrency())
+                    .status(account.getStatus().name())
+                    .createdAt(account.getCreatedAt())
+                    .build();
+        }
+    }
+
+    // ========== TRANSACTION DTOs ============
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TransferRequest {
+        @NotNull(message = "Source account ID is required")
+        private Long sourceAccountId;
+
+        @NotBlank(message = "Destination account number is required")
+        private String destinationAccountNumber;
+
+        @NotNull(message = "Amount is required")
+        @DecimalMin(value = "0.01", message = "Amount must be greater than 0")
+        private BigDecimal amount;
+
+        private String description;
+        private String recipientName;
+        private String recipientBank;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DepositWithdrawRequest {
+        @NotNull(message = "Account ID is required")
+        private Long accountId;
+
+        @NotNull(message = "Amount is required")
+        @DecimalMin(value = "0.01", message = "Amount must be greater than 0")
+        private BigDecimal amount;
+
+        private String description;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TransactionResponse {
+        private Long id;
+        private String referenceNumber;
+        private String transactionType;
+        private BigDecimal amount;
+        private String currency;
+        private String description;
+        private String status;
+        private String sourceAccountNumber;
+        private String destinationAccountNumber;
+        private String recipientName;
+        private String recipientBank;
+        private BigDecimal balanceAfter;
+        private LocalDateTime createdAt;
+        private boolean isCredit;
+
+        public static TransactionResponse fromEntity(Transaction transaction, Long viewingAccountId) {
+            boolean isCredit = transaction.getDestinationAccount() != null &&
+                              transaction.getDestinationAccount().getId().equals(viewingAccountId);
+
+            return TransactionResponse.builder()
+                    .id(transaction.getId())
+                    .referenceNumber(transaction.getReferenceNumber())
+                    .transactionType(transaction.getTransactionType().name())
+                    .amount(transaction.getAmount())
+                    .currency(transaction.getCurrency())
+                    .description(transaction.getDescription())
+                    .status(transaction.getStatus().name())
+                    .sourceAccountNumber(transaction.getSourceAccount() != null ?
+                            transaction.getSourceAccount().getAccountNumber() : null)
+                    .destinationAccountNumber(transaction.getDestinationAccount() != null ?
+                            transaction.getDestinationAccount().getAccountNumber() : transaction.getRecipientAccount())
+                    .recipientName(transaction.getRecipientName())
+                    .recipientBank(transaction.getRecipientBank())
+                    .balanceAfter(transaction.getBalanceAfter())
+                    .createdAt(transaction.getCreatedAt())
+                    .isCredit(isCredit)
+                    .build();
+        }
+        public static TransactionResponse fromEntity(Transaction transaction) {
+            return fromEntity(transaction, null);
+        }
+    }
+
+
+
 
 }
