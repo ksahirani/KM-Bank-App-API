@@ -232,7 +232,55 @@ public class DTOs {
         }
     }
 
+    // ============ DASHBOARD DTOs ============
 
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DashboardResponse {
+        private BigDecimal totalBalance;
+        private long totalAccounts;
+        private long totalTransactions;
+        private BigDecimal monthlyIncome;
+        private BigDecimal monthlyExpenses;
+        private List<AccountResponse> accounts;
+        private List<TransactionResponse> recentTransactions;
+    }
+
+    // ============ API RESPONSE ============
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ApiResponse<T> {
+        private boolean success;
+        private String message;
+        private T data;
+
+        public static <T> ApiResponse<T> success(T data) {
+            return ApiResponse.<T>builder()
+                    .success(true)
+                    .data(data)
+                    .build();
+        }
+
+        public static <T> ApiResponse<T> success(String message, T data) {
+            return ApiResponse.<T>builder()
+                    .success(true)
+                    .message(message)
+                    .data(data)
+                    .build();
+        }
+
+        public static <T> ApiResponse<T> error(String message) {
+            return ApiResponse.<T>builder()
+                    .success(false)
+                    .message(message)
+                    .build();
+        }
+    }
 
 
 }
