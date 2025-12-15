@@ -20,7 +20,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
 
-    public List<AccountResponse> getAccountByUserId(Long userId) {
+    public List<AccountResponse> getAccountsByUserId(Long userId) {
         return accountRepository.findByUserId(userId).stream()
                 .map(AccountResponse::fromEntity)
                 .collect(Collectors.toList());
