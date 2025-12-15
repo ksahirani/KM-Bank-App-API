@@ -38,7 +38,7 @@ public class Transaction {
     private String currency = "PHP";
 
     @Column(length = 500)
-    private String Description;
+    private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
