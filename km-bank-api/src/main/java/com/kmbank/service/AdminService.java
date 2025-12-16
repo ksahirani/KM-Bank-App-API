@@ -121,6 +121,17 @@ public class AdminService {
     }
 
     @Transactional
+    public UserResponse updateUserRole(Long userId, User.Role newRole) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new Exceptions.ResourceNotFoundException("User not found"));
+
+        user.setRole(newRole);
+        user = userRepository.save(user);
+
+        return UserResponse.fromEntity(user);
+    }
+
+    @Transactional
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new Exceptions.ResourceNotFoundException("User not found"));
