@@ -23,7 +23,7 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
 
-    public Page<TransactionResponse> getTransactionByAccountId(long accountId, Long userId, int page, int size) {
+    public Page<TransactionResponse> getTransactionsByAccountId(long accountId, Long userId, int page, int size) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new Exceptions.ResourceNotFoundException("Account not found"));
 
