@@ -1,5 +1,6 @@
 package com.kmbank.dto;
 
+import com.kmbank.dto.AccountTypeStatProjection;
 import com.kmbank.entity.Account;
 import com.kmbank.entity.Transaction;
 import com.kmbank.entity.User;
@@ -13,12 +14,13 @@ import java.util.List;
 public class DTOs {
 
     // ============ AUTH DTOs ============
+
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RegisterRequest {
-        @NotBlank(message = "Email is Required")
+        @NotBlank(message = "Email is required")
         @Email(message = "Invalid email format")
         private String email;
 
@@ -40,8 +42,8 @@ public class DTOs {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LoginRequest {
-        @NotBlank(message = "Email is Required")
-        @Email(message = "Invalid  email format")
+        @NotBlank(message = "Email is required")
+        @Email(message = "Invalid email format")
         private String email;
 
         @NotBlank(message = "Password is required")
@@ -58,7 +60,7 @@ public class DTOs {
         private UserResponse user;
     }
 
-    // ======== USER DTOs ==========
+    // ============ USER DTOs ============
 
     @Data
     @Builder
@@ -103,7 +105,7 @@ public class DTOs {
         private String profileImage;
     }
 
-    // ======= ACCOUNT DTOs ======
+    // ============ ACCOUNT DTOs ============
 
     @Data
     @Builder
@@ -147,7 +149,7 @@ public class DTOs {
         }
     }
 
-    // ========== TRANSACTION DTOs ============
+    // ============ TRANSACTION DTOs ============
 
     @Data
     @Builder
@@ -206,7 +208,7 @@ public class DTOs {
 
         public static TransactionResponse fromEntity(Transaction transaction, Long viewingAccountId) {
             boolean isCredit = transaction.getDestinationAccount() != null &&
-                              transaction.getDestinationAccount().getId().equals(viewingAccountId);
+                    transaction.getDestinationAccount().getId().equals(viewingAccountId);
 
             return TransactionResponse.builder()
                     .id(transaction.getId())
@@ -227,6 +229,7 @@ public class DTOs {
                     .isCredit(isCredit)
                     .build();
         }
+
         public static TransactionResponse fromEntity(Transaction transaction) {
             return fromEntity(transaction, null);
         }
@@ -282,7 +285,7 @@ public class DTOs {
         }
     }
 
-    // ======== ADMIN DTOs ===========
+    // ============ ADMIN DTOs ============
 
     @Data
     @Builder
@@ -377,7 +380,7 @@ public class DTOs {
     @AllArgsConstructor
     public static class AnalyticsResponse {
         private List<DailyStatResponse> dailyStats;
-        private List<AccountTypeStatResponse> accountTypeStats;
+        private List<AccountTypeStatProjection> accountTypeStats;  // ✅ New type
         private BigDecimal totalDeposits;
         private BigDecimal totalWithdrawals;
         private long newUsers;
@@ -396,13 +399,13 @@ public class DTOs {
         private long transactionCount;
     }
 
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class AccountTypeStatResponse {
-        private String accountType;
-        private long count;
-        private BigDecimal totalBalance;
-    }
+    //@Data
+    //@Builder
+    //@NoArgsConstructor
+    //@AllArgsConstructor
+    //public static class AccountTypeStatResponse {
+    //    private String accountType;
+    //    private long count;
+    //    private BigDecimal totalBalance;
+    //}
 }

@@ -1,6 +1,6 @@
 package com.kmbank.repository;
 
-import com.kmbank.dto.DTOs.AccountTypeStatResponse;
+import com.kmbank.dto.AccountTypeStatProjection;
 import com.kmbank.entity.Account;
 import com.kmbank.entity.User;
 import org.springframework.data.domain.Page;
@@ -37,8 +37,12 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     long countByCreatedAtAfter(LocalDateTime dateTime);
 
-    @Query("SELECT new com.kmbank.dto.AccountTypeStatResponse(" +
-            "CAST(a.accountType AS string), COUNT(a), COALESCE(SUM(a.balance), 0)) " +
-            "FROM Account a GROUP BY a.accountType")
-    List<AccountTypeStatResponse> getAccountTypeStats();
+    // ✅ Fixed: Using interface projection with native query
+    @Query(value = "SELECT " +
+            "CAST(account_type AS VARCHAR) AS accountType, " +
+            "COUNT(*) AS count, " +
+            "COALESCE(SUM(balance), 0) AS totalBalance " +
+            "FROM accounts GROUP BY account_type",
+            nativeQuery = true)
+    List<AccountTypeStatProjection> getAccountTypeStats();
 }

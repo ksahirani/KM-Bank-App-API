@@ -1,5 +1,6 @@
 package com.kmbank.service;
 
+import com.kmbank.dto.AccountTypeStatProjection;
 import com.kmbank.dto.DTOs.*;
 import com.kmbank.entity.Account;
 import com.kmbank.entity.Transaction;
@@ -265,7 +266,7 @@ public class AdminService {
         }
 
         List<DailyStatResponse> dailyStats = transactionRepository.getDailyStats(startDate);
-        List<AccountTypeStatResponse> accountTypeStats = accountRepository.getAccountTypeStats();
+        List<AccountTypeStatProjection> accountTypeStats = accountRepository.getAccountTypeStats();
 
         BigDecimal totalDeposits = transactionRepository.getTotalByTypeAndDateAfter(
                 Transaction.TransactionType.DEPOSIT, startDate);
