@@ -36,6 +36,6 @@ build/
 ### VS Code ###
 .vscode/
 
-./src/
+
 .env
-km-bank-api/src/main/resources/application.yml
+src/main/resources/application.yml
