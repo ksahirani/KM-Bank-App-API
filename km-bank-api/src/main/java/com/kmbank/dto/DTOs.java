@@ -104,6 +104,14 @@ public class DTOs {
         private String phoneNumber;
         private String profileImage;
     }
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ChangePasswordRequest {
+        private String currentPassword;
+        private String newPassword;
+    }
 
     // ============ ACCOUNT DTOs ============
 
@@ -146,6 +154,19 @@ public class DTOs {
                     .status(account.getStatus().name())
                     .createdAt(account.getCreatedAt())
                     .build();
+        }
+
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class ChangePasswordRequest {
+            @NotBlank(message = "Current password is required")
+            private String currentPassword;
+
+            @NotBlank(message = "New password is required")
+            @Size(min = 8, message = "New password must be at least 8 characters")
+            private String newPassword;
         }
     }
 
@@ -399,13 +420,5 @@ public class DTOs {
         private long transactionCount;
     }
 
-    //@Data
-    //@Builder
-    //@NoArgsConstructor
-    //@AllArgsConstructor
-    //public static class AccountTypeStatResponse {
-    //    private String accountType;
-    //    private long count;
-    //    private BigDecimal totalBalance;
-    //}
+
 }
