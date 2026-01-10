@@ -32,8 +32,8 @@ public class TransactionService {
         }
 
         Pageable pageable = PageRequest.of(page, size);
-        return transactionRepository.findByAccount(account, pageable)
-                .map(t -> TransactionResponse.fromEntity(t, accountId));
+        Page<Transaction> transactions = transactionRepository.findByAccountId(accountId, pageable);
+        return transactions.map(tx -> TransactionResponse.fromEntity(tx, accountId));
     }
 
     public List<TransactionResponse> getRecentTransactionsByUserId(Long userId, int limit) {
