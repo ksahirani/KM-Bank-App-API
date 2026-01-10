@@ -42,19 +42,22 @@ public class AdminService {
         BigDecimal totalTransfers = transactionRepository.getTotalByType(Transaction.TransactionType.TRANSFER);
         BigDecimal systemBalance = accountRepository.getSystemTotalBalance();
 
-    // Get recent activity
+        // Get recent activity
         LocalDateTime last24Hours = LocalDateTime.now().minusHours(24);
         long newUsersToday = userRepository.countByCreatedAtAfter(last24Hours);
         long transactionsToday = transactionRepository.countByCreatedAtAfter(last24Hours);
 
-    // Get recent users and transactions
+        // Get recent users and transactions
         List<UserResponse> recentUsers = userRepository.findTop10ByOrderByCreatedAtDesc()
                 .stream()
                 .map(UserResponse::fromEntity)
                 .collect(Collectors.toList());
 
+        // FIXED: Use the correct method that returns List<Transaction>
+        Pageable top10 = PageRequest.of(0, 10, Sort.by("createdAt").descending());
         List<AdminTransactionResponse> recentTransactions = transactionRepository
-                .findTop10ByOrderByCreatedAtDesc()
+                .findAll(top10)
+                .getContent()
                 .stream()
                 .map(AdminTransactionResponse::fromEntity)
                 .collect(Collectors.toList());
@@ -82,7 +85,6 @@ public class AdminService {
         Page<User> users;
         if (search != null && !search.trim().isEmpty()) {
             users = userRepository.searchUsers(search.trim(), pageable);
-
         } else {
             users = userRepository.findAll(pageable);
         }
@@ -168,8 +170,11 @@ public class AdminService {
                 .orElseThrow(() -> new Exceptions.ResourceNotFoundException("Account not found"));
 
         Pageable pageable = PageRequest.of(0, 20);
+
+        // FIXED: Use .getContent() to get List from Page
         List<TransactionResponse> recentTransactions = transactionRepository
-                .findByAccount(account, pageable)
+                .findByAccountId(account.getId(), pageable)
+                .getContent()
                 .stream()
                 .map(t -> TransactionResponse.fromEntity(t, accountId))
                 .collect(Collectors.toList());
@@ -210,10 +215,10 @@ public class AdminService {
         // Create adjustment transaction
         Transaction transaction = Transaction.builder()
                 .transactionType(adjustment.compareTo(BigDecimal.ZERO) > 0
-                         ? Transaction.TransactionType.DEPOSIT
-                         : Transaction.TransactionType.WITHDRAWAL)
+                        ? Transaction.TransactionType.DEPOSIT
+                        : Transaction.TransactionType.WITHDRAWAL)
                 .amount(adjustment.abs())
-                .description("Admin adjustment" + reason)
+                .description("Admin adjustment: " + reason)
                 .destinationAccount(adjustment.compareTo(BigDecimal.ZERO) > 0 ? account : null)
                 .sourceAccount(adjustment.compareTo(BigDecimal.ZERO) < 0 ? account : null)
                 .balanceAfter(newBalance)
@@ -243,7 +248,7 @@ public class AdminService {
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new Exceptions.ResourceNotFoundException("Transaction not found"));
 
-        return  AdminTransactionResponse.fromEntity(transaction);
+        return AdminTransactionResponse.fromEntity(transaction);
     }
 
     // ===================== ANALYTICS =====================
@@ -262,10 +267,19 @@ public class AdminService {
                 break;
             default:
                 startDate = LocalDateTime.now().minusMonths(1);
-
         }
 
-        List<DailyStatResponse> dailyStats = transactionRepository.getDailyStats(startDate);
+        // FIXED: Convert Object[] to DailyStatResponse
+        List<Object[]> rawDailyStats = transactionRepository.getDailyStats(startDate);
+        List<DailyStatResponse> dailyStats = rawDailyStats.stream()
+                .map(row -> DailyStatResponse.builder()
+                        .date(row[0] != null ? row[0].toString() : "")
+                        .deposits(row[1] != null ? new BigDecimal(row[1].toString()) : BigDecimal.ZERO)
+                        .withdrawals(row[2] != null ? new BigDecimal(row[2].toString()) : BigDecimal.ZERO)
+                        .transactionCount(row[3] != null ? ((Number) row[3]).longValue() : 0L)
+                        .build())
+                .collect(Collectors.toList());
+
         List<AccountTypeStatProjection> accountTypeStats = accountRepository.getAccountTypeStats();
 
         BigDecimal totalDeposits = transactionRepository.getTotalByTypeAndDateAfter(
